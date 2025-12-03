@@ -1,5 +1,6 @@
 package main.ru.yandex.javacourse.schedule.manager;
 
+import main.ru.yandex.javacourse.schedule.exception.ManagerSaveException;
 import main.ru.yandex.javacourse.schedule.tasks.*;
 
 import java.io.*;
@@ -35,7 +36,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     case TASK -> super.addNewTask(new Task(id, name, description, status));
                     case EPIC -> {
                         Epic epic = new Epic(id, name, description);
-                        epic.setStatus(status);
                         super.addNewEpic(epic);
                     }
                     case SUBTASK -> {
