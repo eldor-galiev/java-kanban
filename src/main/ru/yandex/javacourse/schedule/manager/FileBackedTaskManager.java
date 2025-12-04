@@ -23,6 +23,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             List<String> lines = Files.readAllLines(Paths.get(filePath));
             if (lines.isEmpty()) return;
 
+            int maxId = 0;
             for (int i = 1; i < lines.size(); i++) {
                 String[] parts = lines.get(i).split(",");
 
@@ -32,19 +33,24 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 TaskStatus status = TaskStatus.valueOf(parts[3]);
                 String description = parts[4];
 
+                maxId = Math.max(maxId, id);
+
                 switch (type) {
-                    case TASK -> super.addNewTask(new Task(id, name, description, status));
-                    case EPIC -> {
-                        Epic epic = new Epic(id, name, description);
-                        super.addNewEpic(epic);
-                    }
+                    case TASK -> super.tasks.put(id, new Task(id, name, description, status));
+                    case EPIC -> super.epics.put(id, new Epic(id, name, description));
                     case SUBTASK -> {
                         int epicId = Integer.parseInt(parts[5]);
                         Subtask subtask = new Subtask(id, name, description, status, epicId);
-                        super.addNewSubtask(subtask);
+                        Epic epic = epics.get(epicId);
+                        if (epic != null) {
+                            super.subtasks.put(id, subtask);
+                            epic.addSubtaskId(subtask.getId());
+                            updateEpicStatus(epicId);
+                        }
                     }
                 }
             }
+            super.generatorId = maxId;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
