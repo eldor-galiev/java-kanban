@@ -1,5 +1,7 @@
 package main.ru.yandex.javacourse.schedule.tasks;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
@@ -7,6 +9,8 @@ public class Task {
 	protected String name;
 	protected TaskStatus status;
 	protected String description;
+    protected Duration duration;
+    protected LocalDateTime startTime;
 
 	public Task(int id, String name, String description, TaskStatus status) {
 		this.id = id;
@@ -20,6 +24,25 @@ public class Task {
 		this.description = description;
 		this.status = status;
 	}
+
+    public Task(int id, String name, String description, TaskStatus status,
+                LocalDateTime startTime, Duration duration) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.duration = duration;
+        this.startTime = startTime;
+    }
+
+    public Task(String name, String description, TaskStatus status,
+                LocalDateTime startTime, Duration duration) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.duration = duration;
+        this.startTime = startTime;
+    }
 
 	public int getId() {
 		return id;
@@ -68,10 +91,32 @@ public class Task {
 
 	@Override
 	public String toString() {
-		return id + "," + getType() + "," + name + "," + status + "," + description + ",";
+        return id + "," + getType() + "," + name + "," + status + "," + description
+                + "," + (startTime != null ? startTime : "")
+                + "," + (duration != null ? duration : "") + ",";
 	}
 
     public TaskType getType() {
         return TaskType.TASK;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
     }
 }

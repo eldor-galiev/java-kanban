@@ -14,6 +14,8 @@ import main.ru.yandex.javacourse.schedule.tasks.Task;
 public interface TaskManager {
 	List<Task> getTasks();
 
+    List<Task> getPrioritizedTasks();
+
 	List<Subtask> getSubtasks();
 
 	List<Epic> getEpics();
@@ -51,4 +53,8 @@ public interface TaskManager {
 	void deleteEpics();
 
 	List<Task> getHistory();
+
+    boolean isOverlapping(Task task1, Task task2);
+
+    boolean hasOverlapWithAnyTask(Task newTask);
 }
