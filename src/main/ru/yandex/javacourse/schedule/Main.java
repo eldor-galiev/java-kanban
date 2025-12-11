@@ -7,6 +7,8 @@ import main.ru.yandex.javacourse.schedule.tasks.Subtask;
 import main.ru.yandex.javacourse.schedule.tasks.Task;
 import main.ru.yandex.javacourse.schedule.tasks.TaskStatus;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,8 +22,10 @@ public class Main {
 
         System.out.println("1. СОЗДАНИЕ ЗАДАЧ:");
 
-        Task task1 = new Task("Задача 1", "Описание задачи 1", TaskStatus.NEW);
-        Task task2 = new Task("Задача 2", "Описание задачи 2", TaskStatus.NEW);
+        Task task1 = new Task("Задача 1", "Описание задачи 1", TaskStatus.NEW,
+                LocalDateTime.now(), Duration.ofMinutes(15));
+        Task task2 = new Task("Задача 2", "Описание задачи 2", TaskStatus.NEW,
+                LocalDateTime.now().plusHours(1), Duration.ofMinutes(10));
 
         Epic epicWithSubtasks = new Epic("Эпик с подзадачами", "Эпик с тремя подзадачами");
         Epic epicWithoutSubtasks = new Epic("Пустой эпик", "Эпик без подзадач");
@@ -37,9 +41,12 @@ public class Main {
         System.out.println("- Эпик с подзадачами (id: " + epicWithSubtasksId + ")");
         System.out.println("- Пустой эпик (id: " + epicWithoutSubtasksId + ")");
 
-        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1", TaskStatus.NEW, epicWithSubtasksId);
-        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2", TaskStatus.NEW, epicWithSubtasksId);
-        Subtask subtask3 = new Subtask("Подзадача 3", "Описание подзадачи 3", TaskStatus.NEW, epicWithSubtasksId);
+        Subtask subtask1 = new Subtask("Подзадача 1", "Описание подзадачи 1", TaskStatus.NEW, epicWithSubtasksId,
+                LocalDateTime.now(), Duration.ofMinutes(10));
+        Subtask subtask2 = new Subtask("Подзадача 2", "Описание подзадачи 2", TaskStatus.NEW, epicWithSubtasksId,
+                LocalDateTime.now().plusHours(2), Duration.ofMinutes(30));
+        Subtask subtask3 = new Subtask("Подзадача 3", "Описание подзадачи 3", TaskStatus.NEW, epicWithSubtasksId,
+                LocalDateTime.now().plusHours(3), Duration.ofMinutes(60));
 
         Integer subtaskId1 = manager.addNewSubtask(subtask1);
         Integer subtaskId2 = manager.addNewSubtask(subtask2);

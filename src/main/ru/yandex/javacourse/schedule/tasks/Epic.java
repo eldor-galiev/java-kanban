@@ -2,11 +2,13 @@ package main.ru.yandex.javacourse.schedule.tasks;
 
 import static main.ru.yandex.javacourse.schedule.tasks.TaskStatus.NEW;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
 	protected ArrayList<Integer> subtaskIds = new ArrayList<>();
+    protected LocalDateTime endTime;
 
 	public Epic(int id, String name, String description) {
 		super(id, name, description, NEW);
@@ -33,12 +35,16 @@ public class Epic extends Task {
 	}
 
     @Override
-    public String toString() {
-        return id + "," + getType() + "," + name + "," + status + "," + description + ",";
+    public TaskType getType() {
+        return TaskType.EPIC;
     }
 
     @Override
-    public TaskType getType() {
-        return TaskType.EPIC;
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 }
