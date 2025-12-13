@@ -1,5 +1,6 @@
 package test.ru.yandex.javacourse.schedule.manager;
 
+import main.ru.yandex.javacourse.schedule.exception.TaskOverlapException;
 import main.ru.yandex.javacourse.schedule.manager.HistoryManager;
 import main.ru.yandex.javacourse.schedule.manager.TaskManager;
 import main.ru.yandex.javacourse.schedule.tasks.Epic;
@@ -379,36 +380,39 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     public void testTaskOverlapping() {
         Task task1 = new Task("Task 1", "Description 1", TaskStatus.NEW,
                 LocalDateTime.of(2024, 1, 1, 10, 0), Duration.ofMinutes(60));
-        
+
         Task task2 = new Task("Task 2", "Description 2", TaskStatus.NEW,
                 LocalDateTime.of(2024, 1, 1, 10, 30), Duration.ofMinutes(60));
-        
+
         manager.addNewTask(task1);
-        
-        assertTrue(manager.hasOverlapWithAnyTask(task2), 
-                "Tasks with overlapping intervals should be detected");
-        
+
+        assertThrows(TaskOverlapException.class, () -> {
+            manager.checkOverlappingWithAnyTask(task2);
+        }, "Tasks with overlapping intervals should be detected");
+
         Task task3 = new Task("Task 3", "Description 3", TaskStatus.NEW,
                 LocalDateTime.of(2024, 1, 1, 12, 0), Duration.ofMinutes(60));
-        
-        assertFalse(manager.hasOverlapWithAnyTask(task3),
-                "Tasks with non-overlapping intervals should not be detected");
+
+        assertDoesNotThrow(() -> {
+            manager.checkOverlappingWithAnyTask(task3);
+        }, "Tasks with non-overlapping intervals should not throw exception");
     }
-    
+
     @Test
     public void testTaskOverlappingWithSubtask() {
         Epic epic = new Epic("Epic", "Test");
         int epicId = manager.addNewEpic(epic);
-        
+
         Subtask subtask1 = new Subtask("Subtask 1", "Test", TaskStatus.NEW, epicId,
                 LocalDateTime.of(2024, 1, 1, 10, 0), Duration.ofMinutes(60));
-        
+
         manager.addNewSubtask(subtask1);
-        
+
         Subtask subtask2 = new Subtask("Subtask 2", "Test", TaskStatus.NEW, epicId,
                 LocalDateTime.of(2024, 1, 1, 10, 30), Duration.ofMinutes(60));
-        
-        assertTrue(manager.hasOverlapWithAnyTask(subtask2),
-                "Subtasks with overlapping intervals should be detected");
+
+        assertThrows(TaskOverlapException.class, () -> {
+            manager.checkOverlappingWithAnyTask(subtask2);
+        }, "Tasks with overlapping intervals should be detected");
     }
 }

@@ -1,16 +1,17 @@
 package main.ru.yandex.javacourse.schedule.manager;
 
-import static main.ru.yandex.javacourse.schedule.tasks.TaskStatus.IN_PROGRESS;
-import static main.ru.yandex.javacourse.schedule.tasks.TaskStatus.NEW;
+import main.ru.yandex.javacourse.schedule.exception.TaskOverlapException;
+import main.ru.yandex.javacourse.schedule.tasks.Epic;
+import main.ru.yandex.javacourse.schedule.tasks.Subtask;
+import main.ru.yandex.javacourse.schedule.tasks.Task;
+import main.ru.yandex.javacourse.schedule.tasks.TaskStatus;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import main.ru.yandex.javacourse.schedule.tasks.Epic;
-import main.ru.yandex.javacourse.schedule.tasks.Subtask;
-import main.ru.yandex.javacourse.schedule.tasks.Task;
-import main.ru.yandex.javacourse.schedule.tasks.TaskStatus;
+import static main.ru.yandex.javacourse.schedule.tasks.TaskStatus.IN_PROGRESS;
+import static main.ru.yandex.javacourse.schedule.tasks.TaskStatus.NEW;
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -79,10 +80,11 @@ public class InMemoryTaskManager implements TaskManager {
 	public int addNewTask(Task task) {
 		final int id = ++generatorId;
 		task.setId(id);
-		tasks.put(id, task);
-        if (task.getStartTime() != null && !hasOverlapWithAnyTask(task)) {
+        if (task.getStartTime() != null) {
+            checkOverlappingWithAnyTask(task);
             prioritizedTasks.add(task);
         }
+        tasks.put(id, task);
 		return id;
 	}
 
@@ -104,12 +106,13 @@ public class InMemoryTaskManager implements TaskManager {
 		}
 		final int id = ++generatorId;
 		subtask.setId(id);
-		subtasks.put(id, subtask);
 		epic.addSubtaskId(subtask.getId());
-        if (subtask.getStartTime() != null && !hasOverlapWithAnyTask(subtask)) {
+        if (subtask.getStartTime() != null) {
+            checkOverlappingWithAnyTask(subtask);
             prioritizedTasks.add(subtask);
         }
-		updateEpicStatus(epicId);
+        subtasks.put(id, subtask);
+        updateEpicStatus(epicId);
         updateEpicTimings(epicId);
 		return id;
 	}
@@ -121,10 +124,11 @@ public class InMemoryTaskManager implements TaskManager {
 		if (savedTask == null) {
 			return;
 		}
-		tasks.put(id, task);
-        if (task.getStartTime() != null && !hasOverlapWithAnyTask(task)) {
+        if (task.getStartTime() != null) {
+            checkOverlappingWithAnyTask(task);
             prioritizedTasks.add(task);
         }
+        tasks.put(id, task);
 	}
 
 	@Override
@@ -146,10 +150,11 @@ public class InMemoryTaskManager implements TaskManager {
 		if (epic == null) {
 			return;
 		}
-		subtasks.put(id, subtask);
-        if (subtask.getStartTime() != null && !hasOverlapWithAnyTask(subtask)) {
+        if (subtask.getStartTime() != null) {
+            checkOverlappingWithAnyTask(subtask);
             prioritizedTasks.add(subtask);
         }
+        subtasks.put(id, subtask);
 		updateEpicStatus(epicId);
         updateEpicTimings(epicId);
 	}
@@ -293,9 +298,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public boolean hasOverlapWithAnyTask(Task taskToCheck) {
-        return getPrioritizedTasks().stream()
+    public void checkOverlappingWithAnyTask(Task taskToCheck) {
+        if (getPrioritizedTasks().stream()
                 .filter(task -> task.getId() != taskToCheck.getId())
-                .anyMatch(task -> isOverlapping(task, taskToCheck));
+                .anyMatch(task -> isOverlapping(task, taskToCheck))) {
+            throw new TaskOverlapException("Задача пересекается с существующими задачами");
+        }
     }
 }

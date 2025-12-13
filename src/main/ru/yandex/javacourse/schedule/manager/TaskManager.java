@@ -1,10 +1,10 @@
 package main.ru.yandex.javacourse.schedule.manager;
 
-import java.util.List;
-
 import main.ru.yandex.javacourse.schedule.tasks.Epic;
 import main.ru.yandex.javacourse.schedule.tasks.Subtask;
 import main.ru.yandex.javacourse.schedule.tasks.Task;
+
+import java.util.List;
 
 /**
  * Task manager.
@@ -56,5 +56,5 @@ public interface TaskManager {
 
     boolean isOverlapping(Task task1, Task task2);
 
-    boolean hasOverlapWithAnyTask(Task newTask);
+    void checkOverlappingWithAnyTask(Task newTask);
 }
